@@ -7,6 +7,7 @@ const bodyparser = require('koa-bodyparser');
 const logger = require('koa-logger');
 const koaNunjucks = require('koa-nunjucks-2');
 const path = require('path');
+const cors = require('@koa/cors');
 
 const route_loader = require('./app/utils/route_loader');
 
@@ -20,6 +21,8 @@ app.use(bodyparser({
 app.use(json());
 app.use(logger());
 app.use(require('koa-static')(__dirname + '/app/static'));
+
+app.use(cors());
 
 app.use(koaNunjucks({
     ext: 'nunjucks',

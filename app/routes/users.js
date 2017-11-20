@@ -1,10 +1,10 @@
 
 const base_router = require('../utils/base_router');
 
-router.prefix('/users');
 
 class users extends base_router {
     actions() {
+        this.router.prefix('/users');
         this.router.get('/', async(ctx, next) => {
             ctx.body = {
                 version: '3.0',

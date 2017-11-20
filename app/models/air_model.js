@@ -10,12 +10,10 @@ const mongoose = config.mongoose;
 const Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-/**
- * 置顶设备
- */
+
 const AirSchema = new Schema({
     uid:String,          // 用户ID
-    did:String,          // 设备ID
+    did: ObjectId,          // 设备ID
     name:String,         // 名称
     created_time: Number, // 更新事件
 });

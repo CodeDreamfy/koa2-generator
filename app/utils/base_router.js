@@ -1,10 +1,13 @@
 /**
  * 路由公共基础类
  */
+const config = require('../config/config');
 
 class base_router {
     constructor() {
         this.router = require('koa-router')();
+        this.logger = config.logger;
+        this.error_logger = config.error_logger;
     }
     
     actions() {}

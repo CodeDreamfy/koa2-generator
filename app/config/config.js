@@ -23,7 +23,8 @@ const config = {
 
 // mongo连接配置
 const mongo_url = 'mongodb://localhost:27017/airh5';
-mongoose.Promise = require('bluebird');
+// mongoose.Promise = require('bluebird'); // 替换成 第三方的Promise库，这里是bluebird
+mongoose.Promise = global.Promise  // 也可以替换成 node的Promise
 mongoose.connect(mongo_url, {useMongoClient:true});
 
 const db = mongoose.connection;
