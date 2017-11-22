@@ -12,9 +12,10 @@ const Schema = mongoose.Schema,
 
 
 const AirSchema = new Schema({
-    uid:String,          // 用户ID
-    did: ObjectId,          // 设备ID
+    uid: Number,          // 用户ID
+    did: ObjectId,       // 设备ID
     name:String,         // 名称
+    dataType: Number,     // 空调类型
     created_time: Number, // 更新事件
 });
 

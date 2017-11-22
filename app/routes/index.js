@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const lodash = require('lodash');
 const base_router = require('../utils/base_router');
 const AirModel = require('../models/air_model');
 const config = require('../config/config');
@@ -7,42 +7,48 @@ const mongoose = config.mongoose;
 const ObjectId = mongoose.Types.ObjectId;
 class index extends base_router {
     actions() {
+        this.router.prefix('/api');
         this.router.get('/', async(ctx, next) => {
             await ctx.render('index', {title: 'Koa2'});
         });
     
-        this.router.get('/airs', async(ctx, next) => {
-            const airs = await AirModel.find({}).catch(err => {
+        this.router.get('/devices', async(ctx, next) => {
+            const devices = await AirModel.find({}).catch(err => {
                 this.error_logger.error(err.stack);
                 return null;
             });
             
-            if (!airs) {
+            if (!devices) {
                 ctx.body = {code:500};
                 return;
             }
             
-            ctx.body = airs.map(air => {
-                return {id:air._id, uid:air.uid, did:air.did, name:air.name};
+            ctx.body = devices.map(air => {
+                return {id:air._id, uid:air.uid, did:air.did, name:air.name, dataType: air.dataType};
             });
         });
     
-        this.router.post('/air', async(ctx, next) => {
+        this.router.post('/device', async(ctx, next) => {
             
             const body = ctx.request.body;
-            this.logger.info(body);
-            
-            if (_.isEmpty(body.uid)) {
+            console.log(lodash.isEmpty(body.uid), body.uid);
+            if (!body.uid) {
                 ctx.body = {code:500, msg:'用户ID不能为空'};
                 return;
             }
     
-            if (_.isEmpty(body.did)) {
-                ctx.body = {code:500, msg:'设备ID不能为空'};
+            if (lodash.isEmpty(body.name)) {
+                ctx.body = {code:500, msg:'设备名称不能为空'};
                 return;
             }
             
-            const airModel = new AirModel({uid:body.uid, did:ObjectId(), name:body.name});
+            const airModel = new AirModel({
+                uid:body.uid, 
+                did:ObjectId(), 
+                name:body.name, 
+                dataType: body.dataType, 
+                created_time: +new Date
+            });
             const save_ret = await airModel.save().catch(err => {
                 this.error_logger.error(err.stack);
                 return null;
@@ -52,24 +58,25 @@ class index extends base_router {
                 return;
             }
         
-            ctx.body = {code:0};
+            ctx.body = {code:200, msg: '设备添加成功'};
+            return true;
         });
     
-        this.router.post('/air/name', async(ctx, next) => {
+        this.router.patch('/device', async(ctx, next) => {
         
             const body = ctx.request.body;
             this.logger.info(body);
     
-            if (_.isEmpty(body.id)) {
+            if (lodash.isEmpty(body.did)) {
                 ctx.body = {code:500, msg:'ID不能为空'};
                 return;
             }
-            if (_.isEmpty(body.name)) {
+            if (lodash.isEmpty(body.name)) {
                 ctx.body = {code:500, msg:'名称不能为空'};
                 return;
             }
     
-            const update_ret = await AirModel.update({_id:body.id}, {'$set':{name:body.name}}).catch(err => {
+            const update_ret = await AirModel.update({did:body.did}, {'$set':{name:body.name}}).catch(err => {
                 this.error_logger.error(err.stack);
                 return null;
             });
@@ -81,17 +88,16 @@ class index extends base_router {
             ctx.body = {code:0};
         });
     
-        this.router.delete('/air', async(ctx, next) => {
+        this.router.delete('/device', async(ctx, next) => {
         
-            const query = ctx.request.query;
-            this.logger.info(query);
+            const body = ctx.request.body;
     
-            if (_.isEmpty(query.id)) {
+            if (lodash.isEmpty(body.did)) {
                 ctx.body = {code:500, msg:'ID不能为空'};
                 return;
             }
     
-            const rm_ret = await AirModel.remove({_id:query.id}).catch(err => {
+            const rm_ret = await AirModel.remove({did:body.did}).catch(err => {
                 this.error_logger.error(err.stack);
                 return null;
             });
